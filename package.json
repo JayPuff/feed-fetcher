@@ -1,6 +1,6 @@
 {
   "name": "feed-fetcher",
-  "version": "2.6.0",
+  "version": "2.6.2",
   "description": "fetch API based abstraction to fetch json/text/blob feeds using methods similar to setInterval and setTimeout",
   "main": "FeedFetcher.min.js",
   "scripts": {

@@ -4,7 +4,7 @@
 
 In order to make automatic json (or other) feed fetching easier, with one or multiple sources, this is an abstraction that lets you choose feed url, refresh time, callbacks, using similar syntax as setInterval and setTimeout.
 
-## Documentation for v2.6
+## Documentation for v2.6.2
 
 ### Importing [Webpack]
 Import into a webpack project by using

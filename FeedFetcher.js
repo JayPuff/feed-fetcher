@@ -189,9 +189,9 @@
                     }
                 } else if (_userMethodError) {
                     if(!feed._onError) {
-                        console.warn('FeedFetcher - Caught an error within your code in callback function [' + _userMethodError + ']', {errorType: 'USER_METHOD_ERROR',  errorText: err ,feedObject: feed, status: _status, statusText: _statusText})
+                        console.warn('FeedFetcher - Caught an error within your code in callback function [' + _userMethodError + ']', {errorType: 'USER_METHOD_ERROR', userMethod: _userMethodError,  errorText: err ,feedObject: feed, status: _status, statusText: _statusText})
                     } else {
-                        feed._onError({errorType: 'USER_METHOD_ERROR',  errorText: err , feedObject: feed, status: _status, statusText: _statusText})
+                        feed._onError({errorType: 'USER_METHOD_ERROR',  errorText: err , userMethod: _userMethodError, feedObject: feed, status: _status, statusText: _statusText})
                     }
                 } else {
                     if(_jsonStep) {
