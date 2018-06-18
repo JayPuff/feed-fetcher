@@ -43,7 +43,7 @@ let intervalID = feedFetcher.setInterval({
     url: 'https://somewebsite.com/file.json',
     onData: (data, prevData) => {
         console.log('New Data:', data)
-        clearInterval(intervalID)
+        feedFetcher.clearInterval(intervalID)
     }
 }, 10000)
 ```
