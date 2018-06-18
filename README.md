@@ -18,6 +18,20 @@ import './your-polyfills' // Import your own polyfills if needed. ex: promise-po
 import feedFetcher from 'feed-fetcher'
 ```
 
+### Importing [Script Tag]
+NOTE: Reminder to include fetch and Promise polyfills for browsers like internet explorer, BEFORE including the FeedFetcher script
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@2.0.4/fetch.min.js"> </script>
+<script src="FeedFetcher.min.js"> </script>
+```
+
+```javascript
+// Access it through window:
+window.feedFetcher
+```
+
 ### Using setInterval and clearInterval
 
 ```javascript
@@ -33,7 +47,6 @@ let intervalID = feedFetcher.setInterval({
     }
 }, 10000)
 ```
-
 
 ### setInterval parameters
 ```javascript

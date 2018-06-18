@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/ChocoMilkPlz/feed-fetcher/src/master/"
+    "url": "https://github.com/JayPuff/feed-fetcher"
   },
   "keywords": [
     "feed",
@@ -16,6 +16,5 @@
     "xmlhttprequest"
   ],
   "author": "Nicolas Correa",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/ChocoMilkPlz/feed-fetcher#readme"
+  "license": "ISC"
 }
