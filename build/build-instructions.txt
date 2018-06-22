@@ -1,0 +1,11 @@
+** for npm package **
+install babel-cli 
+install babel-preset-env
+
+npx babel ./FeedFetcher.js --out-file "./script-compiled.js" --presets=env
+
+** for browser script tag add this step **
+
+uglifyjs --compress --mangle -o FeedFetcher.min.js  -- script-compiled.js
+
+

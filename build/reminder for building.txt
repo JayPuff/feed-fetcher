@@ -1,6 +1,0 @@
-copy script to root
-install babel-cli / uglifyjs globally or within wherever you are building
-have babel packages needed as well. (env for example)
-
-npx babel ./FeedFetcher.js --out-file "./script-compiled.js" --presets=env
-uglifyjs --compress --mangle -o FeedFetcher.min.js  -- script-compiled.js

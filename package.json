@@ -16,5 +16,6 @@
     "xmlhttprequest"
   ],
   "author": "Nicolas Correa",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {}
 }
