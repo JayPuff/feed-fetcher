@@ -1,6 +1,7 @@
+
 // Requirements: Fetch API polyfill for browsers/environments that require it.
 //               Promise Polyfill (Used by Fetch)
-//               RequestAnimationFrame polyfill for ie < 11 (will not have same behaviour (dont run when tabbed))
+//               RequestAnimationFrame if you want to setMode('raf') so that it does not run when not tabbed.. not as performant.
 
 
 ((window) => {
@@ -29,19 +30,20 @@
     class FeedFetcher {
         
         constructor() {
+            this._mode = 'interval' // or requestAnimationFrame
             this._requirementsMet = true
             this._requirements = {
                 fetch: true,
                 promise: true,
                 requestAnimationFrame: true
             }
-            if(!window.fetch || !window.Promise || !window.requestAnimationFrame) {
-                console.warn('FeedFetcher - fetch/Promise/requestAnimationFrame are not defined on this browser - If you need to use a polyfill make sure it included before importing or including the FeedFetcher script')
+            if(!window.fetch || !window.Promise) {
+                console.warn('FeedFetcher - fetch/Promise are not defined on this browser - If you need to use a polyfill make sure it included before importing or including the FeedFetcher script')
                 this._requirementsMet = false
                 if(!window.fetch) this._requirements.fetch = false;
                 if(!window.Promise) this._requirements.promise = false;
                 if(!window.requestAnimationFrame) this._requirements.requestAnimationFrame = false;
-                console.error('Requirements not met: [fetch: ' + this._requirements.fetch + '] [Promise:' + this._requirements.promise + '] [requestAnimationFrame: ' + this._requirements.requestAnimationFrame + ']')
+                console.error('Requirements not met: [fetch: ' + this._requirements.fetch + '] [Promise:' + this._requirements.promise + '] [requestAnimationFrame - optional for setMode("raf"): ' + this._requirements.requestAnimationFrame + ']')
             }
     
             // Keep track of feed objects
@@ -70,20 +72,51 @@
             };
     
             // Begin steps
-            this._step()
+            if(this._mode != 'interval') {
+                this._step()
+            }
         }
     
+
+        setMode(mode) {
+            let feedCount = 0
+            for(let f in this._feedObjects) {
+                feedCount += 1
+                break;
+            }
+            if(feedCount != 0) {
+                console.warn('FeedFetcher - Cannot change mode while feed objects have been created.')
+                return;
+            }
+
+            if(this._mode == mode) {
+                console.warn('FeedFetcher - Mode already set to ' + mode)
+                return;
+            }
+
+            if(mode == 'interval') {
+                cancelAnimationFrame(this._animationFrameID)
+                this._mode = 'interval'
+            } else if (mode == 'requestAnimationFrame' || mode == 'raf') {
+                if(this._requirements.requestAnimationFrame) {
+                    this._mode = 'raf'
+                    this._step()
+                } else {
+                    console.warn('FeedFetcher - Cannot change to requestAnimationFrame as it is not supported on this environment.')
+                }
+            }
+        }
     
     
         _step() {
             this._animationFrameID = requestAnimationFrame(this._step.bind(this))
 
             let thisStep = Date.now()
-            let deltaTime = thisStep - feed._lastStep
     
             for(let f in this._feedObjects) {
                 let feed = this._feedObjects[f]
-    
+
+                let deltaTime = thisStep - feed._lastStep
                 feed._lastStep = thisStep
                 feed._millisecondsSinceLastRefresh += deltaTime
     
@@ -102,15 +135,6 @@
             if(!feed) {
                 console.error('FeedFetcher - Tried to fetch but not feed argument exists or it is null')
                 return;
-            }
-    
-            if(feed._once) {
-                if(feed._fetchedOnce) {
-                    this.clearInterval(feed._feedID)
-                    return;
-                } else {
-                    feed._fetchedOnce = true
-                }
             }
     
             let _fetchID = feed._fetchID += 1
@@ -233,6 +257,11 @@
                     }
                 }
             })
+
+            if(feed._once) {
+                this.clearInterval(feed._feedID)
+                return;
+            }
         }
     
     
@@ -376,19 +405,40 @@
             feedObject._onError = options.onError || null
     
             this._feedObjects[feedID] = feedObject
+
+            if(this._mode == 'interval') {
+                if(method == 'fetch') {
+                    this._doFetch(feedObject)
+                } else if (method == 'setTimeout') {
+                    feedObject._clearMode = 'timeout'
+                    feedObject._clearID = setTimeout(() => { this._doFetch(feedObject) }, feedObject._refreshRate)
+                } else {
+                    this._doFetch(feedObject)
+                    feedObject._clearMode = 'interval'
+                    feedObject._clearID = setInterval(() => { this._doFetch(feedObject) }, feedObject._refreshRate)
+                }
+            }
     
             return feedID;
         }
     
         clearInterval(id) {
-            if(this._feedObjects[id]) {
+            let feed = this._feedObjects[id]
+            if(feed) {
+                if(this._mode == 'interval') {
+                    if(feed._clearMode == 'interval') {
+                        clearInterval(this._feedObjects[id]._clearID)
+                    } else {
+                        clearTimeout(this._feedObjects[id]._clearID)
+                    }
+                }
                 delete this._feedObjects[id]
                 // console.log('FeedFetcher - cleared feed #' + id)
             }
         }
     
         clearTimeout(id) {
-            clearInterval(id)
+            this.clearInterval(id)
         }
     }
     

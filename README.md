@@ -1,10 +1,11 @@
 # FeedFetcher
+## Documentation for v2.7
 
 ## What is this for
 
-In order to make automatic json (or other) feed fetching easier, with one or multiple sources, this is an abstraction that lets you choose feed url, refresh time, callbacks, using similar syntax as setInterval and setTimeout.
+In order to make scheduled fetch requests (usually for data feeds) easier and less annoying when it comes to exceptions and errors, feed fetcher handles most of it internally while providing an interface that is very similar to what you are used in the browser: setTimeout/setInterval, it also allows you to feed things once, or use the former methods and clearInterval/clearTimeout as you would normally.
 
-## Documentation for v2.6.2
+For the error types when fetching look at the *error types* section. 
 
 ### Importing [Webpack]
 Import into a webpack project by using
@@ -56,7 +57,7 @@ let options = {
 
     // [optional]
     // Defines how to parse and deal with data internally. If omitted it will be set automatically to 'json' for json files, 'text' for txt files, and by default to 'text' for all other urls
-    // Current possible values: 'json', 'text'
+    // Current possible values: 'json', 'text', 'blob'
     mode: 'json', 
 
 
@@ -87,7 +88,7 @@ let options = {
     // Although errors are already logged, if anything in particular needs to be done depending on the error type, this callback can be specified:
     // error parameter is always an object which contains:
     // error = {
-    //     errorType: 'FETCH_FAIL' || 'JSON_PARSE_FAIL' || 'JSON_AND_TEXT_PARSE_FAIL',
+    //     errorType: 'FETCH_FAIL' || 'JSON_PARSE_FAIL' || 'JSON_AND_TEXT_PARSE_FAIL', //... more error types, look below.
     //     errorText: 'Error text caught in the catch() of the fetch',
     //     feedObject: {'internal feed object being exposed for analysis. Do not modify it'},
 
@@ -152,6 +153,53 @@ feedFetcher.setInterval('/', 'text',
     }
 , 7500)
 
+```
+
+
+### Error Types
+By logging the error object with the onError callback, and reading the errorType property, we can know what went wrong.
+
+```javascript
+error.errorType == 'FETCH_TIMEOUT'
+// The fetch timed out, either because you specified a timeout number in specific: ex: 10000 (10 seconds)
+// Or the default timeout parameter: 15 seconds.
+
+
+error.errorType == 'JSON_PARSE_FAIL'
+// When fetching in JSON mode, response.json() failed internally, so whatever you fetched could not parse properly.
+// error.textContents will contain the response as a string so you can see what might be the problem.
+
+
+error.errorType == 'JSON_AND_TEXT_PARSE_FAIL'
+// When trying to read the text contents of a JSON_PARSE_FAIL error, we also cannot get the text contents. This is not likely.
+
+
+error.errorType == 'BLOB_PARSE_FAIL'
+// Tried to fetch a file/url as a blob but the internal response.blob() failed. Can get text contents of request via error.textContents
+
+
+error.errorType == 'BLOB_AND_TEXT_PARSE_FAIL'
+// Similar as JSON_AND_TEXT_PARSE_FAIL but for blob.
+
+
+error.errorType == 'FETCH_FAIL'
+// General error for failed fetching, use error.errorText, or analyize error.feedObject / error.statusText / error.status to see what went wrong
+
+
+error.errorType == 'USER_METHOD_ERROR'
+// An error got caught within the callback methods supplied: onData, onSameData (Warning: onError will not be caught here.)
+// Ex: Trying to JSON parse something that's not a proper JSON string, whether related to the fetched data or not in this method, will be caught internally.
+// errorText will display the error.
+```
+
+
+### requestAnimationFrame Mode
+If you are confident you will have requestAnimationFrame support on your target browser and you do not want the fetches to run when the page is tabbed out;
+You can set the internal mode of feed fetcher to work via requestAnimationFrame.
+Note that you can only change this when there are no feeds set up to run at an interval or timeout. So ideally, at the beginning of the app.
+
+```javascript
+feedFetcher.setMode('raf') // Default is 'interval'
 ```
 
 
