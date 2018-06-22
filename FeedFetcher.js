@@ -1,4 +1,4 @@
-// Requirements: Fetch API polyfill for browsers that require it.
+// Requirements: Fetch API polyfill for browsers/environments that require it.
 //               Promise Polyfill (Used by Fetch)
 //               RequestAnimationFrame polyfill for ie < 11 (will not have same behaviour (dont run when tabbed))
 
@@ -77,16 +77,14 @@
     
         _step() {
             this._animationFrameID = requestAnimationFrame(this._step.bind(this))
+
+            let thisStep = Date.now()
+            let deltaTime = thisStep - feed._lastStep
     
             for(let f in this._feedObjects) {
                 let feed = this._feedObjects[f]
     
-                
-    
-                let thisStep = (new Date()).getTime()
-                let deltaTime = thisStep - feed._lastStep
                 feed._lastStep = thisStep
-    
                 feed._millisecondsSinceLastRefresh += deltaTime
     
                 if (feed._millisecondsSinceLastRefresh >= feed._refreshRate) {
