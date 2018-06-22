@@ -1,8 +1,8 @@
 {
   "name": "feed-fetcher",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "fetch API based abstraction to fetch json/text/blob feeds using methods similar to setInterval and setTimeout",
-  "main": "FeedFetcher-babel.js",
+  "main": "FeedFetcher.babel.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
