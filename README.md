@@ -3,6 +3,8 @@
 
 ## What is this for
 
+This package is meant for the browser context.
+
 In order to make scheduled fetch requests (usually for data feeds) easier and less annoying when it comes to exceptions and errors, feed fetcher handles most of it internally while providing an interface that is very similar to what you are used in the browser: setTimeout/setInterval, it also allows you to feed things once, or use the former methods and clearInterval/clearTimeout as you would normally.
 
 For the error types when fetching look at the *error types* section. 
